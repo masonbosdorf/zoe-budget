@@ -9,7 +9,7 @@ phone's own storage.
 
 ## What it does
 
-- **Arch gauge** — This Week (next 7 days) and Later (the 14 days after) as fixed segments;
+- **Arch gauge** — This Week (next 7 days) and Later (days 8–14, a fortnight from today) as fixed segments;
   your balance lights them up left to right. The coral number is the balance: tap to edit.
 - **Coverage tiles** — Covered / $X short for each window, plus what's spare after.
 - **Regulars** — three-wide cards sorted soonest first. Today's are outlined.
