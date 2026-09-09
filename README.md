@@ -17,8 +17,13 @@ phone's own storage.
   Monday, monthly 10th → the 10th next month) and it re-sorts. Undo in the toast.
 - **Hold a card** to edit or delete. **+** adds one: weekly, fortnightly, monthly, quarterly
   or yearly; pick a logo or a coloured initial.
-- **…** settings: window lengths, "Done takes it off the balance", Export / Import (JSON via
-  the share sheet), Reset to the seed list.
+- **History** (clock icon) — every bill you've marked Done: what, how much, when, and what it
+  was due; paid-this-month and last-30-days totals.
+- **Pull down** at the top to refresh.
+- **Face ID on open** (settings) — a passkey on the phone gates the screen; verified locally,
+  nothing leaves the device. Re-locks after a minute in the background.
+- **…** settings: window lengths (both count from today), "Done takes it off the balance",
+  Face ID, Export / Import (JSON via the share sheet), Reset to the seed list.
 
 ## Files
 
@@ -30,6 +35,6 @@ phone's own storage.
 
 ## Data
 
-`localStorage` keys: `rg_bills` (the list), `rg_paid` (id → last paid date), `rg_settings`,
-`rg_bal`. Due dates are computed from the rules each open, never stored. Export before
+`localStorage` keys: `rg_bills` (the list), `rg_paid` (id → last paid date), `rg_history`,
+`rg_settings`, `rg_bal`. Due dates are computed from the rules each open, never stored. Export before
 changing phones — there is no cloud copy by design.

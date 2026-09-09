@@ -120,6 +120,39 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 .tog.on{background:var(--coral);} .tog.on::after{transform:translateX(20px);}
 .num{width:76px;height:40px;background:var(--card-2);border-radius:12px;text-align:center;font-weight:700;font-size:16px;}
 
+/* ===== pull to refresh ===== */
+.ptr{position:fixed;left:0;right:0;top:0;height:0;overflow:visible;z-index:15;pointer-events:none;display:flex;justify-content:center;}
+.ptr .pill{margin-top:calc(env(safe-area-inset-top) + 10px);background:var(--card-2);color:var(--muted);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(-30px);transition:opacity .12s,transform .12s;}
+.ptr.show .pill{opacity:1;transform:none;}
+.ptr .pill.ready{color:var(--coral);}
+.ptr .pill .sp{width:12px;height:12px;border:2px solid var(--faint);border-top-color:var(--coral);border-radius:50%;animation:spin .8s linear infinite;display:none;}
+.ptr .pill.busy .sp{display:block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulling{transition:transform .15s;}
+
+/* ===== lock ===== */
+.lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;}
+.lock img{width:88px;height:88px;border-radius:22px;}
+.lock .t{font-size:22px;font-weight:700;margin-top:6px;}
+.lock .d{font-size:14px;color:var(--muted);text-align:center;max-width:28ch;line-height:1.45;}
+.lock button{height:52px;padding:0 26px;border-radius:16px;background:var(--coral);color:#1c1c25;font-weight:700;font-size:16px;display:flex;align-items:center;gap:10px;}
+.lock button.ghost{background:none;color:var(--muted);font-weight:600;height:40px;}
+.lock svg{width:22px;height:22px;}
+
+/* ===== history ===== */
+.top{grid-template-columns:44px 1fr 88px;}
+.top .r{display:flex;justify-content:flex-end;}
+.top .ib svg{width:22px;height:22px;}
+.hist{list-style:none;}
+.hist .day{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:16px 0 8px;}
+.hist li{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.hist .logo{width:36px;height:36px;border-radius:9px;font-size:15px;}
+.hist .n{font-size:15px;font-weight:600;} .hist .s{font-size:12px;color:var(--muted);margin-top:1px;}
+.hist .a{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;}
+.hsum{display:flex;gap:10px;margin-bottom:6px;}
+.hsum .s{flex:1;background:var(--card-2);border-radius:14px;padding:10px 12px;}
+.hsum .k{font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:700;} .hsum .v{font-size:17px;font-weight:700;margin-top:3px;}
+
 /* ===== toast ===== */
 .toast{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:30;max-width:448px;margin:0 auto;background:#2c2c38;border-radius:16px;padding:13px 16px;display:flex;align-items:center;gap:12px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;}
 .toast.on{opacity:1;transform:none;pointer-events:auto;}
@@ -132,7 +165,7 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
   <header class="top">
     <button class="ib" id="btn-settings" aria-label="Settings">&#x2026;</button>
     <div class="t">Regular Expenses</div>
-    <button class="ib add" id="btn-add" aria-label="Add a regular">+</button>
+    <div class="r"><button class="ib" id="btn-history" aria-label="History"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button><button class="ib add" id="btn-add" aria-label="Add a regular">+</button></div>
   </header>
 
   <div class="gauge">
@@ -150,6 +183,14 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
   <div class="foot">Tap a regular when it's paid · hold to edit</div>
 </div>
 
+<div class="ptr" id="ptr"><div class="pill" id="ptr-pill"><span class="sp"></span><span id="ptr-t">Pull to refresh</span></div></div>
+<div class="lock" id="lock" hidden>
+  <img src="icon-180.png" alt="" />
+  <div class="t">Regulars</div>
+  <div class="d" id="lock-d">Unlock with Face ID to see your bills.</div>
+  <button id="lock-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1M15 10v1M12 10v3h-1"/><path d="M9.5 15.5a3.5 3.5 0 0 0 5 0"/></svg>Unlock</button>
+  <button class="ghost" id="lock-skip" hidden>Face ID isn't available here — continue</button>
+</div>
 <div class="dim" id="dim"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
 <input type="file" id="file" accept="application/json" hidden />
@@ -206,7 +247,8 @@ const load = (k, d) => { try { const v = localStorage.getItem(k); return v == nu
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 let BILLS = load('rg_bills', null); if (!BILLS) { BILLS = SEED; save('rg_bills', BILLS); }
 let PAID = load('rg_paid', {});                       // id → ISO date of the last occurrence marked Done
-let SET = Object.assign({ windowA: 7, windowB: 14, subtract: false }, load('rg_settings', {}));
+let SET = Object.assign({ windowA: 7, windowB: 14, subtract: false, faceid: false, cred: null }, load('rg_settings', {}));
+let HIST = load('rg_history', []);   // [{ id, name, amt, due, at }] newest first
 let balance = load('rg_bal', 0);
 
 /* ---------- dates ---------- */
@@ -324,6 +366,7 @@ function openPaid(b) {
 function markPaid(b) {
   const next = nextDue(b); undo = { id: b.id, prev: PAID[b.id], bal: balance };
   PAID[b.id] = iso(next); save('rg_paid', PAID);
+  HIST.unshift({ id: b.id, name: b.name, amt: b.amt, due: iso(next), at: new Date().toISOString() }); HIST = HIST.slice(0, 500); save('rg_history', HIST);
   if (SET.subtract) { balance = Math.max(0, Math.round((balance - b.amt) * 100) / 100); save('rg_bal', balance); bal.value = String(balance); fit(); }
   closeSheet(); render();
   toast(`<span><b>${esc(b.name)}</b> moved to ${fullDate(nextDue(b))}</span><button class="undo" id="undo">Undo</button>`);
@@ -360,11 +403,31 @@ function deleteBill(id) {
   undo = { restore: b }; toast(`<span><b>${esc(b.name)}</b> deleted</span><button class="undo" id="undo">Undo</button>`);
 }
 
+/* history sheet */
+function openHistory() {
+  const now = new Date(), m0 = new Date(now.getFullYear(), now.getMonth(), 1);
+  const thisMonth = HIST.filter(x => new Date(x.at) >= m0).reduce((a, x) => a + x.amt, 0);
+  const d30 = HIST.filter(x => now - new Date(x.at) < 30 * 86400000).reduce((a, x) => a + x.amt, 0);
+  let lastDay = '', rows = '';
+  for (const x of HIST) {
+    const at = new Date(x.at), day = at.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+    if (day !== lastDay) { rows += `<div class="day">${day}</div>`; lastDay = day; }
+    const b = BILLS.find(y => y.id === x.id) || { name: x.name, logo: '', color: '#8f8f9c' };
+    rows += `<li><div class="logo">${logoHTML(b)}</div><div><div class="n">${esc(x.name)}</div><div class="s">was due ${fullDate(parseISO(x.due))} · ${at.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })}</div></div><div class="a">${money(x.amt)}</div></li>`;
+  }
+  openSheet(`<div class="grab"></div><div class="h">History</div>
+    <div class="hsum"><div class="s"><div class="k">Paid this month</div><div class="v">${money(thisMonth)}</div></div><div class="s"><div class="k">Last 30 days</div><div class="v">${money(d30)}</div></div><div class="s"><div class="k">Marked done</div><div class="v">${HIST.length}</div></div></div>
+    ${HIST.length ? `<ul class="hist">${rows}</ul>` : '<div class="empty">Nothing yet. Tap a regular and press Done when you pay it.</div>'}
+    ${HIST.length ? '<button class="link" data-act="clear-history">Clear history</button>' : ''}
+    <div class="btns" style="margin-top:14px"><button class="yes" data-act="close">Done</button></div>`);
+}
+
 /* settings sheet */
 function openSettings() {
   openSheet(`<div class="grab"></div><div class="h">Settings</div>
     <div class="sw"><div><div class="l">This window</div><div class="d">Days the first segment covers</div></div><input class="num" type="number" id="s-a" value="${SET.windowA}" min="1" max="60" inputmode="numeric"></div>
     <div class="sw"><div><div class="l">Later window</div><div class="d">Days from today the second segment reaches</div></div><input class="num" type="number" id="s-b" value="${SET.windowB}" min="1" max="120" inputmode="numeric"></div>
+    <div class="sw"><div><div class="l">Face ID on open</div><div class="d">${webauthnOK() ? 'Ask for Face ID (or passcode) before showing anything' : 'Not available in this browser'}</div></div><button class="tog${SET.faceid ? ' on' : ''}" id="s-face" type="button" aria-label="Toggle" ${webauthnOK() ? '' : 'disabled'}></button></div>
     <div class="sw"><div><div class="l">Done takes it off the balance</div><div class="d">Subtract the amount when you mark a bill paid</div></div><button class="tog${SET.subtract ? ' on' : ''}" id="s-sub" type="button" aria-label="Toggle"></button></div>
     <div class="sw"><div><div class="l">Export</div><div class="d">Save your regulars as a file</div></div><button class="no" style="height:40px;padding:0 16px;border-radius:12px;font-weight:700" data-act="export">Export</button></div>
     <div class="sw"><div><div class="l">Import</div><div class="d">Restore from a file (replaces everything)</div></div><button class="no" style="height:40px;padding:0 16px;border-radius:12px;font-weight:700" data-act="import">Import</button></div>
@@ -372,7 +435,7 @@ function openSettings() {
     <div class="btns" style="margin-top:14px"><button class="yes" data-act="save-settings">Done</button></div>`);
 }
 function exportData() {
-  const data = { app: 'regulars', exported: new Date().toISOString(), bills: BILLS, paid: PAID, settings: SET, balance };
+  const data = { app: 'regulars', exported: new Date().toISOString(), bills: BILLS, paid: PAID, history: HIST, settings: { ...SET, cred: null, faceid: false }, balance };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), name = 'regulars-' + iso(today) + '.json';
   const file = new File([blob], name, { type: 'application/json' });
   if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'Regulars backup' }).catch(() => {}); return; }
@@ -381,8 +444,8 @@ function exportData() {
 $('file').addEventListener('change', async () => {
   const f = $('file').files[0]; if (!f) return;
   try { const d = JSON.parse(await f.text()); if (!Array.isArray(d.bills)) throw 0;
-    BILLS = d.bills; PAID = d.paid || {}; SET = Object.assign(SET, d.settings || {}); balance = d.balance || 0;
-    save('rg_bills', BILLS); save('rg_paid', PAID); save('rg_settings', SET); save('rg_bal', balance); bal.value = String(balance); fit(); closeSheet(); render(); toast('<span>Imported <b>' + BILLS.length + '</b> regulars</span>');
+    BILLS = d.bills; PAID = d.paid || {}; HIST = d.history || []; SET = Object.assign(SET, d.settings || {}, { cred: SET.cred, faceid: SET.faceid }); balance = d.balance || 0;
+    save('rg_bills', BILLS); save('rg_paid', PAID); save('rg_history', HIST); save('rg_settings', SET); save('rg_bal', balance); bal.value = String(balance); fit(); closeSheet(); render(); toast('<span>Imported <b>' + BILLS.length + '</b> regulars</span>');
   } catch (e) { toast('<span>That file isn\'t a Regulars backup</span>'); }
   $('file').value = '';
 });
@@ -395,6 +458,7 @@ $('grid').addEventListener('contextmenu', e => e.preventDefault());
 $('grid').addEventListener('click', e => { const c = e.target.closest('.rg'); if (!c || pressed) { pressed = false; return; } openPaid(BILLS.find(b => b.id === c.dataset.id)); });
 $('btn-add').addEventListener('click', () => openEdit(null));
 $('btn-settings').addEventListener('click', openSettings);
+$('btn-history').addEventListener('click', openHistory);
 $('dim').addEventListener('click', e => {
   if (e.target.id === 'dim') return closeSheet();
   const act = e.target.closest('[data-act]')?.dataset.act;
@@ -404,6 +468,7 @@ $('dim').addEventListener('click', e => {
   else if (act === 'save') saveEdit();
   else if (act === 'delete' && editing) deleteBill(editing.id);
   else if (act === 'export') exportData();
+  else if (act === 'clear-history') { if (confirm('Clear the history list? Bills keep their dates.')) { HIST = []; save('rg_history', HIST); openHistory(); } }
   else if (act === 'import') $('file').click();
   else if (act === 'reset') { if (confirm('Reset to the original list? Paid dates are cleared too.')) { BILLS = SEED.map(b => ({ ...b })); PAID = {}; save('rg_bills', BILLS); save('rg_paid', PAID); closeSheet(); render(); } }
   else if (act === 'save-settings') { SET.windowA = Math.max(1, parseInt($('s-a').value, 10) || 7); SET.windowB = Math.max(SET.windowA + 1, parseInt($('s-b').value, 10) || 14); save('rg_settings', SET); closeSheet(); render(); }
@@ -412,16 +477,73 @@ $('dim').addEventListener('click', e => {
   const l = e.target.closest('#e-logos .pick'); if (l && editing) { editing.logo = l.dataset.logo; [...l.parentNode.children].forEach(x => x.classList.toggle('on', x === l)); $('e-colors').hidden = !!editing.logo; }
   const c = e.target.closest('#e-colors button'); if (c && editing) { editing.color = c.dataset.c; [...c.parentNode.children].forEach(x => x.classList.toggle('on', x === c)); const lp = $('e-logos').querySelector('[data-logo=""]'); if (lp) lp.style.background = editing.color; }
   if (e.target.id === 's-sub') { SET.subtract = !SET.subtract; e.target.classList.toggle('on', SET.subtract); save('rg_settings', SET); }
+  if (e.target.id === 's-face') { if (SET.faceid) { SET.faceid = false; SET.cred = null; save('rg_settings', SET); e.target.classList.remove('on'); } else enrolFace(e.target); }
 });
 $('sheet').addEventListener('input', e => { if (e.target.id === 'e-name' && editing) { const lp = $('e-logos').querySelector('[data-logo=""]'); if (lp) lp.textContent = (e.target.value.trim()[0] || 'A').toUpperCase(); } });
 $('toast').addEventListener('click', e => {
   if (e.target.id !== 'undo' || !undo) return;
   if (undo.restore) { BILLS.push(undo.restore); save('rg_bills', BILLS); }
-  else { if (undo.prev) PAID[undo.id] = undo.prev; else delete PAID[undo.id]; save('rg_paid', PAID); if (undo.bal != null && SET.subtract) { balance = undo.bal; save('rg_bal', balance); bal.value = String(balance); fit(); } }
+  else { if (undo.prev) PAID[undo.id] = undo.prev; else delete PAID[undo.id]; save('rg_paid', PAID); if (HIST[0] && HIST[0].id === undo.id) { HIST.shift(); save('rg_history', HIST); } if (undo.bal != null && SET.subtract) { balance = undo.bal; save('rg_bal', balance); bal.value = String(balance); fit(); } }
   undo = null; $('toast').classList.remove('on'); render();
 });
 addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { const t = new Date(); t.setHours(0, 0, 0, 0); if (+t !== +today) location.reload(); } });   // new day → fresh dates
+
+/* ---------- Face ID: a passkey on this phone, verified locally. Nothing leaves the device; the
+   platform authenticator (Face ID / Touch ID / passcode) is the gate. It protects the screen, not
+   the storage — same trade-off as any app lock without a server. ---------- */
+const webauthnOK = () => !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get && window.isSecureContext);
+const rnd = n => crypto.getRandomValues(new Uint8Array(n));
+const b64 = u8 => btoa(String.fromCharCode(...u8)); const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function enrolFace(tog) {
+  if (!webauthnOK()) return;
+  try {
+    const cred = await navigator.credentials.create({ publicKey: {
+      rp: { name: 'Regulars' }, user: { id: rnd(16), name: 'regulars', displayName: 'Regulars' }, challenge: rnd(32),
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+      authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
+    SET.cred = b64(new Uint8Array(cred.rawId)); SET.faceid = true; save('rg_settings', SET); if (tog) tog.classList.add('on');
+    toast('<span>Face ID is on. It\'ll ask next time you open Regulars.</span>');
+  } catch (e) { toast('<span>Couldn\'t set up Face ID' + (e && e.name === 'NotAllowedError' ? ' — cancelled' : '') + '</span>'); }
+}
+async function verifyFace() {
+  const opts = { challenge: rnd(32), userVerification: 'required', timeout: 60000 };
+  if (SET.cred) opts.allowCredentials = [{ type: 'public-key', id: unb64(SET.cred), transports: ['internal'] }];
+  const a = await navigator.credentials.get({ publicKey: opts });
+  return !!a;
+}
+let locked = false, hiddenAt = 0;
+function lock() { if (!SET.faceid) return; locked = true; $('lock').hidden = false; $('lock-skip').hidden = webauthnOK(); $('lock-d').textContent = webauthnOK() ? 'Unlock with Face ID to see your bills.' : 'Face ID isn\'t available in this browser.'; }
+async function unlock() {
+  if (!webauthnOK()) { locked = false; $('lock').hidden = true; return; }
+  try { if (await verifyFace()) { locked = false; $('lock').hidden = true; } }
+  catch (e) { $('lock-d').textContent = e && e.name === 'NotAllowedError' ? 'Face ID was cancelled. Tap Unlock to try again.' : 'Face ID didn\'t work. Tap Unlock to try again.'; }
+}
+$('lock-btn').addEventListener('click', unlock);
+$('lock-skip').addEventListener('click', () => { locked = false; $('lock').hidden = true; });
+if (SET.faceid) { lock(); setTimeout(unlock, 350); }   // ask straight away; the button is there if iOS wants a tap first
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { hiddenAt = Date.now(); return; }
+  if (SET.faceid && !locked && Date.now() - hiddenAt > 60000) { lock(); setTimeout(unlock, 350); }   // away over a minute → re-lock
+});
+
+/* ---------- pull to refresh (home-screen apps have no browser one) ---------- */
+(() => {
+  const ptr = $('ptr'), pill = $('ptr-pill'), txt = $('ptr-t'), app = document.querySelector('.app'); let y0 = null, dy = 0, active = false;
+  const TH = 78;
+  addEventListener('touchstart', e => { if (locked || $('dim').classList.contains('on')) return; if (scrollY <= 0 && e.touches.length === 1) { y0 = e.touches[0].clientY; active = false; } else y0 = null; }, { passive: true });
+  addEventListener('touchmove', e => {
+    if (y0 == null) return; dy = e.touches[0].clientY - y0;
+    if (dy > 8 && scrollY <= 0) { active = true; const d = Math.min(dy, 140) * 0.55; app.style.transform = `translateY(${d}px)`; ptr.classList.add('show'); pill.classList.toggle('ready', dy > TH); txt.textContent = dy > TH ? 'Release to refresh' : 'Pull to refresh'; }
+  }, { passive: true });
+  addEventListener('touchend', () => {
+    if (!active) { y0 = null; return; }
+    app.classList.add('pulling');
+    if (dy > TH) { pill.classList.add('busy'); txt.textContent = 'Refreshing'; app.style.transform = 'translateY(40px)'; setTimeout(() => location.reload(), 250); }
+    else { app.style.transform = ''; ptr.classList.remove('show'); }
+    setTimeout(() => app.classList.remove('pulling'), 200); y0 = null; dy = 0; active = false;
+  }, { passive: true });
+})();
 
 fit(); render();
 </script>
