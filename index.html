@@ -271,7 +271,8 @@ function drawGauge(bal, needA, needB) {
 
 /* ---------- render ---------- */
 function render() {
-  const endA = addDays(today, SET.windowA - 1), endB = addDays(endA, SET.windowB);
+  // both windows count from TODAY: This = next windowA days, Later = the rest of the next windowB days (e.g. days 8–14)
+  const endA = addDays(today, SET.windowA - 1), endB = addDays(today, Math.max(SET.windowB, SET.windowA + 1) - 1);
   let needA = 0, needB = 0;
   const cards = BILLS.map(b => {
     const oa = occurrences(b, today, endA), ob = occurrences(b, addDays(endA, 1), endB);
@@ -281,7 +282,7 @@ function render() {
   drawGauge(balance, needA, needB);
   $('of').innerHTML = `<span>of <b>${money(needA)}</b></span><span class="q" title="Due in the next ${SET.windowA} days">?</span>`;
   const shortA = Math.max(0, needA - balance), shortB = Math.max(0, needA + needB - balance), left = balance - needA - needB;
-  const laterName = SET.windowB === 14 ? 'Next fortnight' : SET.windowB === 7 ? 'Next week' : `Next ${SET.windowB} days`;
+  const laterName = SET.windowB === 14 ? 'Next fortnight' : `Next ${SET.windowB} days`;
   const thisName = SET.windowA === 7 ? 'This week' : SET.windowA === 14 ? 'This fortnight' : `Next ${SET.windowA} days`;
   $('status').innerHTML = `
     <div class="s"><div class="k">${thisName}</div><div class="v ${shortA ? 'bad' : 'ok'}">${shortA ? money(shortA) + ' short' : 'Covered'}</div><div class="sub">${money(needA)} due by ${endA.getDate()} ${mon(endA)}</div></div>
@@ -363,7 +364,7 @@ function deleteBill(id) {
 function openSettings() {
   openSheet(`<div class="grab"></div><div class="h">Settings</div>
     <div class="sw"><div><div class="l">This window</div><div class="d">Days the first segment covers</div></div><input class="num" type="number" id="s-a" value="${SET.windowA}" min="1" max="60" inputmode="numeric"></div>
-    <div class="sw"><div><div class="l">Later window</div><div class="d">Days after that</div></div><input class="num" type="number" id="s-b" value="${SET.windowB}" min="1" max="120" inputmode="numeric"></div>
+    <div class="sw"><div><div class="l">Later window</div><div class="d">Days from today the second segment reaches</div></div><input class="num" type="number" id="s-b" value="${SET.windowB}" min="1" max="120" inputmode="numeric"></div>
     <div class="sw"><div><div class="l">Done takes it off the balance</div><div class="d">Subtract the amount when you mark a bill paid</div></div><button class="tog${SET.subtract ? ' on' : ''}" id="s-sub" type="button" aria-label="Toggle"></button></div>
     <div class="sw"><div><div class="l">Export</div><div class="d">Save your regulars as a file</div></div><button class="no" style="height:40px;padding:0 16px;border-radius:12px;font-weight:700" data-act="export">Export</button></div>
     <div class="sw"><div><div class="l">Import</div><div class="d">Restore from a file (replaces everything)</div></div><button class="no" style="height:40px;padding:0 16px;border-radius:12px;font-weight:700" data-act="import">Import</button></div>
@@ -405,7 +406,7 @@ $('dim').addEventListener('click', e => {
   else if (act === 'export') exportData();
   else if (act === 'import') $('file').click();
   else if (act === 'reset') { if (confirm('Reset to the original list? Paid dates are cleared too.')) { BILLS = SEED.map(b => ({ ...b })); PAID = {}; save('rg_bills', BILLS); save('rg_paid', PAID); closeSheet(); render(); } }
-  else if (act === 'save-settings') { SET.windowA = Math.max(1, parseInt($('s-a').value, 10) || 7); SET.windowB = Math.max(1, parseInt($('s-b').value, 10) || 14); save('rg_settings', SET); closeSheet(); render(); }
+  else if (act === 'save-settings') { SET.windowA = Math.max(1, parseInt($('s-a').value, 10) || 7); SET.windowB = Math.max(SET.windowA + 1, parseInt($('s-b').value, 10) || 14); save('rg_settings', SET); closeSheet(); render(); }
   const p = e.target.closest('#e-period button'); if (p && editing) { editing.period = p.dataset.p; [...p.parentNode.children].forEach(x => x.classList.toggle('on', x === p)); $('f-dow').hidden = editing.period !== 'w'; $('f-day').hidden = editing.period !== 'm'; $('f-next').hidden = !'fqy'.includes(editing.period); }
   const d = e.target.closest('#e-dow button'); if (d && editing) { editing.dow = +d.dataset.d; [...d.parentNode.children].forEach(x => x.classList.toggle('on', x === d)); }
   const l = e.target.closest('#e-logos .pick'); if (l && editing) { editing.logo = l.dataset.logo; [...l.parentNode.children].forEach(x => x.classList.toggle('on', x === l)); $('e-colors').hidden = !!editing.logo; }
