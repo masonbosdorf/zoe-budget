@@ -545,6 +545,18 @@ document.addEventListener('visibilitychange', () => {
   }, { passive: true });
 })();
 
+/* ---------- auto-update: every 10 min compare index.html's ETag with the one loaded; reload when idle ---------- */
+(() => {
+  let tag = null, pending = false;
+  const etag = async () => { try { const r = await fetch('index.html', { method: 'HEAD', cache: 'no-store' }); return r.ok ? (r.headers.get('etag') || r.headers.get('last-modified')) : null; } catch (e) { return null; } };
+  const idle = () => !$('dim').classList.contains('on') && !locked && document.activeElement !== bal;
+  const check = async () => { const t = await etag(); if (!t) return; if (tag == null) { tag = t; return; } if (t !== tag) { pending = true; if (idle()) location.reload(); } };
+  etag().then(t => { tag = t; });
+  setInterval(check, 10 * 60 * 1000);
+  setInterval(() => { if (pending && idle()) location.reload(); }, 30 * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+})();
+
 fit(); render();
 </script>
 </body>
