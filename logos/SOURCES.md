@@ -14,3 +14,10 @@
 - apple.png — Apple logo glyph (simple-icons) on grey, matching the Up tile
 - origin.png — App Store icon (iTunes Search API, 512px)
 - groceries — inline SVG cart, not a brand
+- budgetdirect.png — budgetdirect.com.au apple-touch-icon (BD monogram, 180px) on white — the app icon carries 'Fuel Discounts' (fetched 2026-09-14)
+- spotify.png — Spotify mark (simple-icons) in #1ED760 on black, full-bleed — the App Store icon has a baked glass frame (fetched 2026-09-14)
+- warriorone.png — App Store icon (iTunes Search API, 1024px) — Warrior One Yoga, Brighton/Mordialloc/Mornington (fetched 2026-09-14)
+- orana.png — App Store icon (iTunes Search API, 1024px) — Orana Pilates & Wellness, Bentleigh (fetched 2026-09-14)
+- coles.png — App Store icon (iTunes Search API, 1024px) (fetched 2026-09-14)
+- woolworths.png — App Store icon (iTunes Search API, 1024px), grey tile/bevel flattened to white (fetched 2026-09-14)
+- united.png — United App icon (iTunes Search API, 1024px) (fetched 2026-09-14)
