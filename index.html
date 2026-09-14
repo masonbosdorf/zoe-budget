@@ -6,11 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Regulars" />
+<meta name="apple-mobile-web-app-title" content="Zoe's Budget" />
 <meta name="theme-color" content="#191a22" />
 <link rel="apple-touch-icon" href="icon-180.png" />
 <link rel="icon" href="icon-180.png" />
-<title>Regulars</title>
+<title>Zoe's Budget</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -130,14 +130,28 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 @keyframes spin{to{transform:rotate(360deg)}}
 .pulling{transition:transform .15s;}
 
-/* ===== lock ===== */
-.lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;}
-.lock img{width:88px;height:88px;border-radius:22px;}
-.lock .t{font-size:22px;font-weight:700;margin-top:6px;}
-.lock .d{font-size:14px;color:var(--muted);text-align:center;max-width:28ch;line-height:1.45;}
-.lock button{height:52px;padding:0 26px;border-radius:16px;background:var(--coral);color:#1c1c25;font-weight:700;font-size:16px;display:flex;align-items:center;gap:10px;}
-.lock button.ghost{background:none;color:var(--muted);font-weight:600;height:40px;}
-.lock svg{width:22px;height:22px;}
+/* ===== lock: code pad + Face ID ===== */
+.lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;}
+.lock img{width:76px;height:76px;border-radius:19px;}
+.lock .t{font-size:22px;font-weight:700;margin-top:4px;}
+.lock .d{font-size:14px;color:var(--muted);text-align:center;min-height:20px;}
+.dots{display:flex;gap:16px;margin:4px 0 16px;}
+.dots i{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--faint);transition:background .1s,border-color .1s;}
+.dots i.on{background:var(--coral);border-color:var(--coral);}
+.dots.bad{animation:shake .35s;} .dots.bad i{border-color:var(--bad);}
+@keyframes shake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:14px 22px;}
+.pad button{width:76px;height:76px;border-radius:50%;background:var(--card);font-size:30px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+.pad button:active{background:var(--card-2);}
+.pad button.k2{background:none;color:var(--muted);} #pad-face{color:var(--coral);}
+.pad svg{width:30px;height:30px;}
+
+/* ===== logo picker groups + photo tile ===== */
+.gl{font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--faint);font-weight:700;margin:0 0 7px;}
+.logos + .gl{margin-top:14px;}
+.logos .pick.photo{background:var(--card-2);color:var(--muted);}
+.logos .pick.photo:not(.has){opacity:1;}
+.logos .pick.photo:not(.has) svg{width:50%;height:50%;}
 
 /* ===== history ===== */
 .top{grid-template-columns:44px 1fr 88px;}
@@ -184,47 +198,30 @@ input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid 
 </div>
 
 <div class="ptr" id="ptr"><div class="pill" id="ptr-pill"><span class="sp"></span><span id="ptr-t">Pull to refresh</span></div></div>
-<div class="lock" id="lock" hidden>
+<div class="lock" id="lock">
   <img src="icon-180.png" alt="" />
-  <div class="t">Regulars</div>
-  <div class="d" id="lock-d">Unlock with Face ID to see your bills.</div>
-  <button id="lock-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1M15 10v1M12 10v3h-1"/><path d="M9.5 15.5a3.5 3.5 0 0 0 5 0"/></svg>Unlock</button>
-  <button class="ghost" id="lock-skip" hidden>Face ID isn't available here — continue</button>
+  <div class="t">Zoe's Budget</div>
+  <div class="d" id="lock-d">Enter your code</div>
+  <div class="dots" id="dots"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="pad" id="pad"><button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button class="k2" id="pad-face" type="button" aria-label="Unlock with Face ID" style="visibility:hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1M15 10v1M12 10v3h-1"/><path d="M9.5 15.5a3.5 3.5 0 0 0 5 0"/></svg></button><button data-k="0">0</button><button class="k2" data-k="del" aria-label="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M17.5 9.5l-5 5M12.5 9.5l5 5"/></svg></button></div>
 </div>
 <div class="dim" id="dim"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
 <input type="file" id="file" accept="application/json" hidden />
+<input type="file" id="photo" accept="image/*" hidden />
 
 <script>
 /* ============================================================
-   Regulars — recurring bills on the phone. Data lives in localStorage only.
-   bill: { id, name, amt, period:'w'|'f'|'m'|'q'|'y', dow (w), day (m), next (f/q/y ISO anchor), logo, color }
+   Zoe's Budget — a copy of Regulars (recurring bills on the phone). Data lives in localStorage only.
+   Starts empty; logos are emoji presets, brand marks, or a photo from the camera roll.
+   bill: { id, name, amt, period:'w'|'f'|'m'|'q'|'y', dow (w), day (m), next (f/q/y ISO anchor), logo, color, img (logo 'photo') }
    ============================================================ */
 const $ = id => document.getElementById(id);
 const PERIOD = { w: 'Weekly', f: 'Fortnightly', m: 'Monthly', q: 'Quarterly', y: 'Yearly' };
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const COLORS = ['#f77860', '#fbcc72', '#5ed39b', '#4a9be6', '#a78bfa', '#f472b6', '#8f8f9c', '#2fb562'];
 
-/* seed — Mason's list, 10 Sep 2026 */
-const SEED = [
-  { id: 'phone',  name: 'Vodafone',         amt: 96,    period: 'm', day: 10,            logo: 'vodafone' },
-  { id: 'youi',   name: 'Youi',             amt: 155,   period: 'm', day: 28,            logo: 'youi' },
-  { id: 'vic',    name: 'VicRoads',         amt: 242,   period: 'q', next: '2026-12-01', logo: 'vicroads' },
-  { id: 'wifi',   name: 'Aussie Broadband', amt: 60,    period: 'm', day: 7,             logo: 'abb' },
-  { id: 'kayo',   name: 'Kayo Sports',      amt: 40,    period: 'm', day: 1,             logo: 'kayo' },
-  { id: 'nflx',   name: 'Netflix',          amt: 21,    period: 'm', day: 30,            logo: 'netflix' },
-  { id: 'stan',   name: 'Stan',             amt: 32,    period: 'm', day: 16,            logo: 'stan' },
-  { id: 'lat',    name: 'Latitude',         amt: 30,    period: 'w', dow: 4,             logo: 'latitude' },
-  { id: 'yt',     name: 'YouTube',          amt: 17.99, period: 'm', day: 25,            logo: 'youtube' },
-  { id: 'bupa',   name: 'Bupa',             amt: 150,   period: 'm', day: 27,            logo: 'bupa' },
-  { id: 'nh',     name: 'Newshosting',      amt: 21,    period: 'q', next: '2026-12-07', logo: 'nh' },
-  { id: 'apple',  name: 'Apple',            amt: 2.49,  period: 'm', day: 17,            logo: 'apple' },
-  { id: 'cr',     name: 'Crunchyroll',      amt: 11.99, period: 'm', day: 28,            logo: 'crunchy' },
-  { id: 'groc',   name: 'Groceries',        amt: 60,    period: 'w', dow: 1,             logo: 'groceries' },
-  { id: 'origin', name: 'Origin hot water', amt: 87.5,  period: 'q', next: '2026-11-08', logo: 'origin' },
-];
-
-const LOGOS = {  /* official marks: App Store icons via the iTunes Search API, sites' own apple-touch-icons, Newshosting's logo mark, Apple's glyph; groceries stays the cart */
+const LOGOS = {  /* official marks: App Store icons via the iTunes Search API, sites' own apple-touch-icons, Newshosting's logo mark, Apple's glyph */
   vodafone: '<img src="data:image/webp;base64,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" alt="" >',
   youi: '<img src="data:image/webp;base64,UklGRkAEAABXRUJQVlA4IDQEAABwGgCdASqAAIAAPkkijkUioiESyjWAKASEtIALaf8Af0btZ/qXQ8+B0jP1f+x6AX/Jv7d+WX5Acinx7+Z/538vOYz5a/U7/Lv8jxqdAD8nf9D+2e6H/Cf9HyofOv/Z9wL+S/1z/af2ThXP2wLi31AVe+o8Xtt1CE1OiPNcRDgSqb1g8TEjs7vx7a1GpCsvGXx9Rjz9u6QaSUXRvay92KAj5bQWoj2xyWAlfuU5Irs5RJ0cY+eLSFjX39F+KB1BoEjQlFYhhSFtwNYdQ8Sz2+bZHr9IQRnmoCr3/yAAAP79VuhonkcPFf7FY7z+lHrURCw/wIlMZMiqykosCCq4pFJg3BEgfzmPHd1L6ihYO0TZTcnYh+wQNSC3cddg8UYfs4YL+lzBb195lSKg6XBPjT5/UAk6ZurD7zE2CiVC1oTn/NpJ88l+Jsf/B1fdjNw/hnt+CSYfOJPA5P4tqgXW5lUCkAFXG0IRgQnQ6kX38ZToJ6wau/n/zs4y6VaHuZpuF4u9nJrYl+Kk9H0nNCGwrW9b2hMwsISiDAkGBIMAwn4cpIoFd0kB3O2FeDDSz8FmbcNICBvZ8hJrsMzV1RGl8cFv/dfwY8LxHehEaCXa/kliMpaJWROejr/vSyN/vOHGZDKf9hBf/+kE8nYgzOVrFp3kzQmOH736ABMI/QM7iKAEX0XFy37y7/8d8pvLjDZn//hhMbal/YYy1xm8U+W5/FT8Kp43nE+DHm9LAVG4MMH/8lHru2kKKmrTtPhyH8JM7wIY8WxoXuhINTed+98DZzYETEQLeF8RInaP1qzkob7y2in5aOYjb43q7luDETP77rTA1P/9tHKe6hm7uHoRIANDnYf2SG7ILsBYOhifGZVBX0Lsl1sk5LYVZr5WqVoLAPHGAGIiDUGVdtapKCOgG4roJXLiwjkvJt95otvleunL3Gm5/ahpYRWmCfVA+NL9TsVF3QEPTcKPCECa3LGtd2IYhtfGMcv/606qdjbf4XoZyvOv1EuCVZMHCEaszLLKGW/QjK+qvvfpt+StZBvoZVB/61wZVqIpCs6Me7OtbtMEffHfPxUW9rhr4lt9LL0iQQggCPCW+1dwxY+UDfz9f6pL+3fglE5GY77TO590aeUi7AbBeAUdarCWa0oNltF/XY0F/BotaLVO5jMVtv49KkSZG+nCu/2RCV9CQR5u+97wfLH6Ke6eeRZBQxAKw1s37HzFJ+x0OCN//X+tR90Uyj8kTzM6nE6f30Rs/2fls9rqJAP5YWN0y1xP//wO/12e6q5PoLAQQYDwAPr5ZpJ4wH3bZprSEqr7iM9nKD7c7TSDe/LNKoeL7Y90Fjaxy8H1fw+sQie/BCl0GU1lj4bDpdx6DsSqtP8+Hn1vRWbVKHbMiaEiHK69kHD//jJlVdyRPJCYSNHg8LOb1XEoliBu5M4AAAAAAA==" alt="" >',
   vicroads: '<img src="data:image/webp;base64,UklGRq4FAABXRUJQVlA4IKIFAAAwIACdASqAAIAAPkkijUQioiEXCyRUKASEpEdyGsV3/AdqCAbxPmn2V+3firluDhdsmRL1ueYB+jn+1/rHXV8wvnM+mT/SeoT/ZuoT3jX9p/3L9mBo/T15cel3mp+M38z/xnsF+VJ7HvRj/bAlD+ZV4ujjfAG2a6XNMQR9SQB6zvgzrbSJNy1j04LcRGUJrOOKiVjPeL3zeqDvqJl7U612ZPyxTauMYsYVVnrlE9UOxvnG296kblCEIv5tUs2VggqWxFFDrhLLx3+UsE8MIGs4CMd9XY2AcRg/yeIBcOtENDSs+prES3wH4EkHsxFES2vmClfD7RLp1Bk1ql4akqZKq4twERvgIf6aAAD+/zJVchd4ImyWHVJRr2biLrSf5FY8mCSryQcu08a3ADIEbHlbn6riO4g50Be1Po4H7C+RwbXDjx/wRwwhMICcWKZPSYtFeEWz7J3OluxolNNu3UYgYYMj6mGFlkIaRcudgKWdlwetmXeAReeHgdh8v42HrzmJNjOworCxpdjsPFBFYeUabfy0BhuUW/b0vx/kAFP0TvrshkJf3w+lKIec2YxYDlUknByDGQbMkIJIQ6h5sbk0arfGKQxzYyB95FAmkkBsNbuA5tLwajac+OweHj3kNXxGlhf2/oI2H7PJxITK89LLmYVtb7KIf5kRHSentqoH7tHbdm7hXUeoXO2wBPZtjdOZb6BZ+Uf+NlrMeqKXgj4QJzBMeZtOx6kVbqQRA9PzUPzcz8VtqT4vGi5Y9StlhaNoxuKWegI0BSSV8oGfrE9DOXG53W/TfcyIkBj5vMDl936rX8A0npB0g/fw3aarlEL4ChAoXZmSbSsY/cjB6EMmry4jvP6OV/3HRmQv9nwbWo18NOtuBUiR+doTlX7yw2AZ8QfV5nBv/6oTs1WrS1X/2y73XLpAGJ+cbIEo2NL7l2BpkbtSMJ+8AQy3dWoXav9pz9iJD7VXv3VQh+7Onl7qyd/vkwmLQoDKj5NfwlbxPygmLdgeXIb4wlRQy+8tqJkIkZUdzPx/+k8DhdRJfKdsRP4nfoEopd7UOWXZXFJtHdb/bxwe0YWkWnNNBZMNgeJbKNC4G4RlmTFD1HhdRqOje5nBSjni8qVBsG31oexf7F6tkF1WHrF08RJRTqjRuDMGQRwNNVtVCQLhOAka3e3pSXDSVaTG3QG2AcYaTennxFVxpexLqVvktvM0H5fzzDOcSAnWB7CwYZi0fQ9a3+bHusC+aWhQh5wzLUovlMKCBq489PBNLlLO8AgXtCyfgqGa9JZAWhvIXunFLefzXF2KqbOi/dPoZqDDJqCFOYADLZxwFmRXgIt+ttN3Tr1WMdaKs3V+H23k1oZ6GMlY2XLThsexY0eAsjA36lmQcLLxLKOSlTCzJ9x13fpc9YIXOH6xdED3vTnuMWBFKpamryohWw4hfn/wzQToEDdL2o6YEsxKLzJDYeYZZfmHTwa3wdcMB26G5AojzD1SB0gRsz9f1tgVPdZ28m2Y3IzBwtijQMXb3OiOiz+urBNIxyn/BVAHOi/saFwk0SrP67I3FDghfdbh5np9QvSpBFrXFAUzGLHNG+6tWhjWdOPU/lnuv/EPui4+i9xYqSKcxqsruR1w6dIzcroGNQXVHEjB8SUAjLACeEykqcl/aVLSQFUxsWHUvq1xcmrXia0EqJkOC8+OhWgFaMGbgyqwwQofopHLZVGVyhLFplrze5ekPIoF2Zn5NhUkld129SJL4WdPrepSeENq+XhktG7Oq0dM3kWRt7hO60Gjs2UvVjBiMICCKPotx3tzzHqxP6ll/O9ShWFjBH5ADy4nv4QDhtX++fJFG4aI0sa8Be2mLzfrj7AWXu30x2E3NBKKw7sRzf0fauVy5KvmNlN7OXJoKoSJZuTXhVgz5gc+rOqhLNozt87wAAAAAA==" alt="" >',
@@ -239,17 +236,36 @@ const LOGOS = {  /* official marks: App Store icons via the iTunes Search API, s
   apple: '<img src="data:image/webp;base64,UklGRi4CAABXRUJQVlA4ICICAAAQEACdASqAAIAAPkkikEWioiGTiJRoKASEtIULUfRzNjb4Mp0GmmceST6gS08SVwMv/BeHlEMsHw1kn3Fd32+yBtqbwaUr6ggNQRzYDxERPSsaznhMARu8YUSqEhtxGxQpM+cZVJyycUabup7rivpGmh7PFKBk9SJlOfz3SvhSISoA0iVqYeDCAAD+/V/HFR4STNNMOb/4oAtYNZYhoxG4iqBu5q6nrce5CNckODKBegIE+z82rcYlT9a9B+YaIZAFdrPg3yJScPcPwbMbNymMZA+Gro/vNFeAoI4eg2dfTQILiYF0xTNL+aTjEsP71n4dSzm/9SdarPkG16yzAg3NHn+3Yw+o0fdGYD1Oo72KzqPytlw4dww86Ueo//eN2FjKFUB+Zh4gVpQSr1Z92nOR4tSFf/QQftIC561T1XQjUrP9I4Aka5cdpWKZhox0sxW6/ZXTgq7AvTEwwYaHDs94zXlyMa4O6VDbQlmZBL0UEI/KLpZkb+q/1x/shfLWXcxhfNDKNn4AoDB4ZO0x9KzF80xw+2uNXOP6p7m7H8EAqqKSPLLuZh2IAAD82CrQWnaRCJpbN50V4a6zmDt9VzHq8NSKxKvHhR/BWh28KrA/zZ+XS6waqFwQzXnpqzoxNQGBOw0zxYc/lsadXauznIrIz7y329zY4K0Fd83JXc2NyIqruxgXJB1mcd+5MAT+FpIzm2qRkfjORZvfYyVFmAAAAAA=" alt="" >',
   crunchy: '<img src="data:image/webp;base64,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" alt="" >',
   origin: '<img src="data:image/webp;base64,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" alt="" >',
-  groceries: '<svg viewBox="0 0 56 56"><rect width="56" height="56" fill="#35a86b"/><path d="M12 16h6l4 18h18l4-12H22" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="24" cy="41" r="2.5" fill="#fff"/><circle cx="38" cy="41" r="2.5" fill="#fff"/></svg>',
 };
+
+/* preset names: tapping a preset fills the name if it's still blank */
+const NAMES = { vodafone: 'Vodafone', youi: 'Youi', vicroads: 'VicRoads', abb: 'Aussie Broadband', kayo: 'Kayo Sports', netflix: 'Netflix', stan: 'Stan', latitude: 'Latitude', youtube: 'YouTube', bupa: 'Bupa', nh: 'Newshosting', apple: 'Apple', crunchy: 'Crunchyroll', origin: 'Origin Energy' };
+const BRAND_KEYS = Object.keys(NAMES);
+/* the 30 most common household bills — native emoji on a tinted tile */
+const EMOJI = [
+  ['rent', '🏠', 'Rent', '#f77860'],        ['mortgage', '🏡', 'Mortgage', '#f77860'],   ['power', '⚡', 'Electricity', '#fbcc72'],
+  ['gas', '🔥', 'Gas', '#f79068'],          ['water', '💧', 'Water', '#4a9be6'],         ['wifi', '📶', 'Internet', '#4a9be6'],
+  ['phone', '📱', 'Phone', '#a78bfa'],      ['tv', '📺', 'TV Streaming', '#f472b6'],     ['music', '🎧', 'Music', '#5ed39b'],
+  ['subs', '☁️', 'Subscriptions', '#4a9be6'], ['groceries', '🛒', 'Groceries', '#5ed39b'], ['rego', '🚗', 'Car Rego', '#f77860'],
+  ['carins', '🛡️', 'Car Insurance', '#4a9be6'], ['petrol', '⛽', 'Petrol', '#fbcc72'],    ['tolls', '🛣️', 'Tolls', '#5ed39b'],
+  ['transport', '🚆', 'Public Transport', '#a78bfa'], ['health', '🩺', 'Health Insurance', '#5ed39b'], ['home', '☂️', 'Home Insurance', '#4a9be6'],
+  ['rates', '🏛️', 'Council Rates', '#8f8f9c'], ['strata', '🏢', 'Strata', '#8f8f9c'],    ['medical', '💊', 'Medical', '#f472b6'],
+  ['gym', '🏋️', 'Gym', '#f79068'],          ['beauty', '💇‍♀️', 'Hair & Beauty', '#f472b6'], ['card', '💳', 'Credit Card', '#a78bfa'],
+  ['loan', '🏦', 'Loan', '#8f8f9c'],        ['bnpl', '🛍️', 'Afterpay', '#5ed39b'],       ['pets', '🐾', 'Pets', '#fbcc72'],
+  ['childcare', '🧸', 'Childcare', '#f472b6'], ['education', '🎓', 'Education', '#4a9be6'], ['savings', '🐷', 'Savings', '#f472b6'],
+];
+EMOJI.forEach(([k, e, n, c]) => { LOGOS['e_' + k] = `<svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#2f2f3c"/><rect width="40" height="40" fill="${c}" fill-opacity=".3"/><text x="20" y="21.5" font-size="23" text-anchor="middle" dominant-baseline="central">${e}</text></svg>`; NAMES['e_' + k] = n; });
+const EMOJI_KEYS = EMOJI.map(x => 'e_' + x[0]);
+const CAM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>';
 
 /* ---------- storage ---------- */
 const load = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-let BILLS = load('rg_bills', null); if (!BILLS) { BILLS = SEED; save('rg_bills', BILLS); }
-let PAID = load('rg_paid', {});                       // id → ISO date of the last occurrence marked Done
-let SET = Object.assign({ windowA: 7, windowB: 14, subtract: false, faceid: false, cred: null }, load('rg_settings', {}));
-let HIST = load('rg_history', []);   // [{ id, name, amt, due, at }] newest first
-let balance = load('rg_bal', 0);
+let BILLS = load('zb_bills', []);
+let PAID = load('zb_paid', {});                       // id → ISO date of the last occurrence marked Done
+let SET = Object.assign({ windowA: 7, windowB: 14, subtract: false, faceid: false, cred: null, faceAsked: false }, load('zb_settings', {}));
+let HIST = load('zb_history', []);   // [{ id, name, amt, due, at }] newest first
+let balance = load('zb_bal', 0);
 
 /* ---------- dates ---------- */
 const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -281,6 +297,7 @@ function whenLabel(d) {
 }
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function logoHTML(b) {
+  if (b.logo === 'photo' && b.img) return `<img src="${esc(b.img)}" alt="">`;
   if (b.logo && LOGOS[b.logo]) return LOGOS[b.logo];
   const ch = (b.name || '?').trim()[0] || '?';
   return `<span class="logo" style="background:${b.color || '#8f8f9c'};width:100%;height:100%;border-radius:0">${esc(ch.toUpperCase())}</span>`;
@@ -343,13 +360,13 @@ function render() {
 const bal = $('bal'); bal.value = String(balance || 0);
 const mirror = document.createElement('span'); mirror.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:inherit;'; bal.parentNode.appendChild(mirror);
 const fit = () => { mirror.textContent = bal.value || '0'; bal.style.width = (mirror.offsetWidth + 6) + 'px'; };
-bal.addEventListener('input', () => { bal.value = bal.value.replace(/[^0-9.]/g, ''); balance = parseFloat(bal.value) || 0; save('rg_bal', balance); fit(); render(); });
+bal.addEventListener('input', () => { bal.value = bal.value.replace(/[^0-9.]/g, ''); balance = parseFloat(bal.value) || 0; save('zb_bal', balance); fit(); render(); });
 bal.addEventListener('focus', () => bal.select());
 bal.addEventListener('keydown', e => { if (e.key === 'Enter') bal.blur(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 
 /* ---------- sheets ---------- */
-let sheetBill = null, editing = null, undo = null, toastT = null;
+let sheetBill = null, editing = null, undo = null, toastT = null, autoName = '';
 function openSheet(html) { $('sheet').innerHTML = html; $('dim').classList.add('on'); }
 function closeSheet() { $('dim').classList.remove('on'); sheetBill = null; editing = null; }
 function toast(html, ms = 5000) { $('toast').innerHTML = html; $('toast').classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => $('toast').classList.remove('on'), ms); }
@@ -365,9 +382,9 @@ function openPaid(b) {
 }
 function markPaid(b) {
   const next = nextDue(b); undo = { id: b.id, prev: PAID[b.id], bal: balance };
-  PAID[b.id] = iso(next); save('rg_paid', PAID);
-  HIST.unshift({ id: b.id, name: b.name, amt: b.amt, due: iso(next), at: new Date().toISOString() }); HIST = HIST.slice(0, 500); save('rg_history', HIST);
-  if (SET.subtract) { balance = Math.max(0, Math.round((balance - b.amt) * 100) / 100); save('rg_bal', balance); bal.value = String(balance); fit(); }
+  PAID[b.id] = iso(next); save('zb_paid', PAID);
+  HIST.unshift({ id: b.id, name: b.name, amt: b.amt, due: iso(next), at: new Date().toISOString() }); HIST = HIST.slice(0, 500); save('zb_history', HIST);
+  if (SET.subtract) { balance = Math.max(0, Math.round((balance - b.amt) * 100) / 100); save('zb_bal', balance); bal.value = String(balance); fit(); }
   closeSheet(); render();
   toast(`<span><b>${esc(b.name)}</b> moved to ${fullDate(nextDue(b))}</span><button class="undo" id="undo">Undo</button>`);
 }
@@ -375,9 +392,13 @@ function markPaid(b) {
 /* edit / add sheet */
 function openEdit(b) {
   editing = b ? { ...b } : { id: 'b' + Date.now().toString(36), name: '', amt: '', period: 'm', day: today.getDate(), dow: 1, next: iso(today), logo: '', color: COLORS[0] };
-  const e = editing;
-  const picks = Object.keys(LOGOS).map(k => `<button class="pick${e.logo === k ? ' on' : ''}" data-logo="${k}" type="button">${LOGOS[k]}</button>`).join('')
-    + `<button class="pick${!e.logo ? ' on' : ''}" data-logo="" type="button" style="background:${e.color || COLORS[0]}">${esc((e.name || 'A').trim()[0] || 'A').toUpperCase()}</button>`;
+  const e = editing; autoName = '';
+  const tile = k => `<button class="pick${e.logo === k ? ' on' : ''}" data-logo="${k}" data-name="${esc(NAMES[k])}" type="button" aria-label="${esc(NAMES[k])}">${LOGOS[k]}</button>`;
+  const picks = `<div class="gl">Common bills</div><div class="logos">`
+    + `<button class="pick photo${e.img ? ' has' : ''}${e.logo === 'photo' ? ' on' : ''}" data-logo="photo" type="button" aria-label="Photo from camera roll">${e.img ? `<img src="${esc(e.img)}" alt="">` : CAM}</button>`
+    + EMOJI_KEYS.map(tile).join('')
+    + `<button class="pick${!e.logo ? ' on' : ''}" data-logo="" type="button" style="background:${e.color || COLORS[0]}">${esc((e.name || 'A').trim()[0] || 'A').toUpperCase()}</button>`
+    + `</div><div class="gl">Brands</div><div class="logos">${BRAND_KEYS.map(tile).join('')}</div>`;
   openSheet(`<div class="grab"></div><div class="h">${b ? 'Edit regular' : 'New regular'}</div>
     <div class="f"><label>Name</label><input type="text" id="e-name" value="${esc(e.name)}" placeholder="e.g. Spotify" autocomplete="off"></div>
     <div class="f"><label>Amount</label><input type="number" id="e-amt" value="${e.amt}" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div>
@@ -385,7 +406,7 @@ function openEdit(b) {
     <div class="f" id="f-dow" ${e.period === 'w' ? '' : 'hidden'}><label>Day</label><div class="dows" id="e-dow">${DOW.map((d, i) => `<button type="button" data-d="${i}" class="${e.dow === i ? 'on' : ''}">${d}</button>`).join('')}</div></div>
     <div class="f" id="f-day" ${e.period === 'm' ? '' : 'hidden'}><label>Day of month</label><input type="number" id="e-day" value="${e.day || 1}" min="1" max="31" inputmode="numeric"></div>
     <div class="f" id="f-next" ${'fqy'.includes(e.period) ? '' : 'hidden'}><label>Next due</label><input type="date" id="e-next" value="${e.next || iso(today)}"></div>
-    <div class="f"><label>Logo</label><div class="logos" id="e-logos">${picks}</div><div class="swatches" id="e-colors" ${e.logo ? 'hidden' : ''}>${COLORS.map(c => `<button type="button" data-c="${c}" style="background:${c}" class="${e.color === c ? 'on' : ''}"></button>`).join('')}</div></div>
+    <div class="f"><label>Logo</label><div id="e-logos">${picks}</div><div class="swatches" id="e-colors" ${e.logo ? 'hidden' : ''}>${COLORS.map(c => `<button type="button" data-c="${c}" style="background:${c}" class="${e.color === c ? 'on' : ''}"></button>`).join('')}</div></div>
     <div class="btns">${b ? '<button class="del" data-act="delete">Delete</button>' : '<button class="no" data-act="close">Cancel</button>'}<button class="yes" data-act="save">Save</button></div>
     ${b ? '<button class="link" data-act="close">Cancel</button>' : ''}`);
   setTimeout(() => { if (!b) $('e-name').focus(); }, 50);
@@ -393,15 +414,38 @@ function openEdit(b) {
 function saveEdit() {
   const e = editing; e.name = $('e-name').value.trim(); e.amt = parseFloat($('e-amt').value) || 0;
   if (!e.name) { $('e-name').focus(); return; }
+  if (e.logo !== 'photo') delete e.img;
   if (e.period === 'm') e.day = Math.min(31, Math.max(1, parseInt($('e-day').value, 10) || 1));
   if ('fqy'.includes(e.period)) e.next = $('e-next').value || iso(today);
   const i = BILLS.findIndex(x => x.id === e.id); if (i >= 0) BILLS[i] = e; else BILLS.push(e);
-  save('rg_bills', BILLS); closeSheet(); render();
+  save('zb_bills', BILLS); closeSheet(); render();
 }
 function deleteBill(id) {
-  const b = BILLS.find(x => x.id === id); BILLS = BILLS.filter(x => x.id !== id); delete PAID[id]; save('rg_bills', BILLS); save('rg_paid', PAID); closeSheet(); render();
+  const b = BILLS.find(x => x.id === id); BILLS = BILLS.filter(x => x.id !== id); delete PAID[id]; save('zb_bills', BILLS); save('zb_paid', PAID); closeSheet(); render();
   undo = { restore: b }; toast(`<span><b>${esc(b.name)}</b> deleted</span><button class="undo" id="undo">Undo</button>`);
 }
+
+function pickLogo(l) {
+  editing.logo = l.dataset.logo; $('e-logos').querySelectorAll('.pick').forEach(x => x.classList.toggle('on', x === l)); $('e-colors').hidden = !!editing.logo;
+  const nm = $('e-name'), n = l.dataset.name;
+  if (n && (!nm.value.trim() || nm.value === autoName)) { nm.value = autoName = n; nm.dispatchEvent(new Event('input', { bubbles: true })); }
+}
+/* photo from the camera roll → centre-cropped 192px JPEG stored on the bill */
+$('photo').addEventListener('change', () => {
+  const f = $('photo').files[0]; $('photo').value = ''; if (!f || !editing) return;
+  const url = URL.createObjectURL(f), im = new Image();
+  im.onload = () => {
+    const S = 192, c = document.createElement('canvas'), x = c.getContext('2d'), side = Math.min(im.naturalWidth, im.naturalHeight);
+    c.width = c.height = S; x.fillStyle = '#fff'; x.fillRect(0, 0, S, S);
+    x.drawImage(im, (im.naturalWidth - side) / 2, (im.naturalHeight - side) / 2, side, side, 0, 0, S, S);
+    URL.revokeObjectURL(url);
+    editing.img = c.toDataURL('image/jpeg', 0.85);
+    const t = $('e-logos') && $('e-logos').querySelector('[data-logo="photo"]'); if (!t) return;
+    t.innerHTML = `<img src="${editing.img}" alt="">`; t.classList.add('has'); pickLogo(t);
+  };
+  im.onerror = () => { URL.revokeObjectURL(url); toast('<span>Couldn\'t read that image</span>'); };
+  im.src = url;
+});
 
 /* history sheet */
 function openHistory() {
@@ -427,26 +471,26 @@ function openSettings() {
   openSheet(`<div class="grab"></div><div class="h">Settings</div>
     <div class="sw"><div><div class="l">This window</div><div class="d">Days the first segment covers</div></div><input class="num" type="number" id="s-a" value="${SET.windowA}" min="1" max="60" inputmode="numeric"></div>
     <div class="sw"><div><div class="l">Later window</div><div class="d">Days from today the second segment reaches</div></div><input class="num" type="number" id="s-b" value="${SET.windowB}" min="1" max="120" inputmode="numeric"></div>
-    <div class="sw"><div><div class="l">Face ID on open</div><div class="d">${webauthnOK() ? 'Ask for Face ID (or passcode) before showing anything' : 'Not available in this browser'}</div></div><button class="tog${SET.faceid ? ' on' : ''}" id="s-face" type="button" aria-label="Toggle" ${webauthnOK() ? '' : 'disabled'}></button></div>
+    <div class="sw"><div><div class="l">Face ID on open</div><div class="d">${webauthnOK() ? 'Unlock with Face ID instead of typing the code' : 'Not available in this browser'}</div></div><button class="tog${SET.faceid ? ' on' : ''}" id="s-face" type="button" aria-label="Toggle" ${webauthnOK() ? '' : 'disabled'}></button></div>
     <div class="sw"><div><div class="l">Done takes it off the balance</div><div class="d">Subtract the amount when you mark a bill paid</div></div><button class="tog${SET.subtract ? ' on' : ''}" id="s-sub" type="button" aria-label="Toggle"></button></div>
     <div class="sw"><div><div class="l">Export</div><div class="d">Save your regulars as a file</div></div><button class="no" style="height:40px;padding:0 16px;border-radius:12px;font-weight:700" data-act="export">Export</button></div>
     <div class="sw"><div><div class="l">Import</div><div class="d">Restore from a file (replaces everything)</div></div><button class="no" style="height:40px;padding:0 16px;border-radius:12px;font-weight:700" data-act="import">Import</button></div>
-    <div class="sw" style="border:0"><div><div class="l">Start again</div><div class="d">Reset to the original list</div></div><button class="del" style="height:40px;padding:0 16px;border-radius:12px;font-weight:700" data-act="reset">Reset</button></div>
+    <div class="sw" style="border:0"><div><div class="l">Start again</div><div class="d">Delete every bill and the history</div></div><button class="del" style="height:40px;padding:0 16px;border-radius:12px;font-weight:700" data-act="reset">Reset</button></div>
     <div class="btns" style="margin-top:14px"><button class="yes" data-act="save-settings">Done</button></div>`);
 }
 function exportData() {
-  const data = { app: 'regulars', exported: new Date().toISOString(), bills: BILLS, paid: PAID, history: HIST, settings: { ...SET, cred: null, faceid: false }, balance };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), name = 'regulars-' + iso(today) + '.json';
+  const data = { app: 'zoe-budget', exported: new Date().toISOString(), bills: BILLS, paid: PAID, history: HIST, settings: { ...SET, cred: null, faceid: false }, balance };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), name = 'zoe-budget-' + iso(today) + '.json';
   const file = new File([blob], name, { type: 'application/json' });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'Regulars backup' }).catch(() => {}); return; }
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: "Zoe's Budget backup" }).catch(() => {}); return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 $('file').addEventListener('change', async () => {
   const f = $('file').files[0]; if (!f) return;
   try { const d = JSON.parse(await f.text()); if (!Array.isArray(d.bills)) throw 0;
     BILLS = d.bills; PAID = d.paid || {}; HIST = d.history || []; SET = Object.assign(SET, d.settings || {}, { cred: SET.cred, faceid: SET.faceid }); balance = d.balance || 0;
-    save('rg_bills', BILLS); save('rg_paid', PAID); save('rg_history', HIST); save('rg_settings', SET); save('rg_bal', balance); bal.value = String(balance); fit(); closeSheet(); render(); toast('<span>Imported <b>' + BILLS.length + '</b> regulars</span>');
-  } catch (e) { toast('<span>That file isn\'t a Regulars backup</span>'); }
+    save('zb_bills', BILLS); save('zb_paid', PAID); save('zb_history', HIST); save('zb_settings', SET); save('zb_bal', balance); bal.value = String(balance); fit(); closeSheet(); render(); toast('<span>Imported <b>' + BILLS.length + '</b> regulars</span>');
+  } catch (e) { toast('<span>That file isn\'t a budget backup</span>'); }
   $('file').value = '';
 });
 
@@ -468,22 +512,23 @@ $('dim').addEventListener('click', e => {
   else if (act === 'save') saveEdit();
   else if (act === 'delete' && editing) deleteBill(editing.id);
   else if (act === 'export') exportData();
-  else if (act === 'clear-history') { if (confirm('Clear the history list? Bills keep their dates.')) { HIST = []; save('rg_history', HIST); openHistory(); } }
+  else if (act === 'clear-history') { if (confirm('Clear the history list? Bills keep their dates.')) { HIST = []; save('zb_history', HIST); openHistory(); } }
   else if (act === 'import') $('file').click();
-  else if (act === 'reset') { if (confirm('Reset to the original list? Paid dates are cleared too.')) { BILLS = SEED.map(b => ({ ...b })); PAID = {}; save('rg_bills', BILLS); save('rg_paid', PAID); closeSheet(); render(); } }
-  else if (act === 'save-settings') { SET.windowA = Math.max(1, parseInt($('s-a').value, 10) || 7); SET.windowB = Math.max(SET.windowA + 1, parseInt($('s-b').value, 10) || 14); save('rg_settings', SET); closeSheet(); render(); }
+  else if (act === 'reset') { if (confirm('Delete every bill and the history? This can\'t be undone.')) { BILLS = []; PAID = {}; HIST = []; save('zb_bills', BILLS); save('zb_paid', PAID); save('zb_history', HIST); closeSheet(); render(); } }
+  else if (act === 'face-on') { closeSheet(); enrolFace(null); }
+  else if (act === 'save-settings') { SET.windowA = Math.max(1, parseInt($('s-a').value, 10) || 7); SET.windowB = Math.max(SET.windowA + 1, parseInt($('s-b').value, 10) || 14); save('zb_settings', SET); closeSheet(); render(); }
   const p = e.target.closest('#e-period button'); if (p && editing) { editing.period = p.dataset.p; [...p.parentNode.children].forEach(x => x.classList.toggle('on', x === p)); $('f-dow').hidden = editing.period !== 'w'; $('f-day').hidden = editing.period !== 'm'; $('f-next').hidden = !'fqy'.includes(editing.period); }
   const d = e.target.closest('#e-dow button'); if (d && editing) { editing.dow = +d.dataset.d; [...d.parentNode.children].forEach(x => x.classList.toggle('on', x === d)); }
-  const l = e.target.closest('#e-logos .pick'); if (l && editing) { editing.logo = l.dataset.logo; [...l.parentNode.children].forEach(x => x.classList.toggle('on', x === l)); $('e-colors').hidden = !!editing.logo; }
+  const l = e.target.closest('#e-logos .pick'); if (l && editing) { if (l.dataset.logo === 'photo' && (!editing.img || editing.logo === 'photo')) $('photo').click(); else pickLogo(l); }
   const c = e.target.closest('#e-colors button'); if (c && editing) { editing.color = c.dataset.c; [...c.parentNode.children].forEach(x => x.classList.toggle('on', x === c)); const lp = $('e-logos').querySelector('[data-logo=""]'); if (lp) lp.style.background = editing.color; }
-  if (e.target.id === 's-sub') { SET.subtract = !SET.subtract; e.target.classList.toggle('on', SET.subtract); save('rg_settings', SET); }
-  if (e.target.id === 's-face') { if (SET.faceid) { SET.faceid = false; SET.cred = null; save('rg_settings', SET); e.target.classList.remove('on'); } else enrolFace(e.target); }
+  if (e.target.id === 's-sub') { SET.subtract = !SET.subtract; e.target.classList.toggle('on', SET.subtract); save('zb_settings', SET); }
+  if (e.target.id === 's-face') { if (SET.faceid) { SET.faceid = false; SET.cred = null; save('zb_settings', SET); e.target.classList.remove('on'); } else enrolFace(e.target); }
 });
 $('sheet').addEventListener('input', e => { if (e.target.id === 'e-name' && editing) { const lp = $('e-logos').querySelector('[data-logo=""]'); if (lp) lp.textContent = (e.target.value.trim()[0] || 'A').toUpperCase(); } });
 $('toast').addEventListener('click', e => {
   if (e.target.id !== 'undo' || !undo) return;
-  if (undo.restore) { BILLS.push(undo.restore); save('rg_bills', BILLS); }
-  else { if (undo.prev) PAID[undo.id] = undo.prev; else delete PAID[undo.id]; save('rg_paid', PAID); if (HIST[0] && HIST[0].id === undo.id) { HIST.shift(); save('rg_history', HIST); } if (undo.bal != null && SET.subtract) { balance = undo.bal; save('rg_bal', balance); bal.value = String(balance); fit(); } }
+  if (undo.restore) { BILLS.push(undo.restore); save('zb_bills', BILLS); }
+  else { if (undo.prev) PAID[undo.id] = undo.prev; else delete PAID[undo.id]; save('zb_paid', PAID); if (HIST[0] && HIST[0].id === undo.id) { HIST.shift(); save('zb_history', HIST); } if (undo.bal != null && SET.subtract) { balance = undo.bal; save('zb_bal', balance); bal.value = String(balance); fit(); } }
   undo = null; $('toast').classList.remove('on'); render();
 });
 addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
@@ -499,11 +544,11 @@ async function enrolFace(tog) {
   if (!webauthnOK()) return;
   try {
     const cred = await navigator.credentials.create({ publicKey: {
-      rp: { name: 'Regulars' }, user: { id: rnd(16), name: 'regulars', displayName: 'Regulars' }, challenge: rnd(32),
+      rp: { name: "Zoe's Budget" }, user: { id: rnd(16), name: 'zoe-budget', displayName: "Zoe's Budget" }, challenge: rnd(32),
       pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
       authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
-    SET.cred = b64(new Uint8Array(cred.rawId)); SET.faceid = true; save('rg_settings', SET); if (tog) tog.classList.add('on');
-    toast('<span>Face ID is on. It\'ll ask next time you open Regulars.</span>');
+    SET.cred = b64(new Uint8Array(cred.rawId)); SET.faceid = true; save('zb_settings', SET); if (tog) tog.classList.add('on');
+    toast('<span>Face ID is on. It\'ll ask next time you open the app.</span>');
   } catch (e) { toast('<span>Couldn\'t set up Face ID' + (e && e.name === 'NotAllowedError' ? ' — cancelled' : '') + '</span>'); }
 }
 async function verifyFace() {
@@ -512,19 +557,50 @@ async function verifyFace() {
   const a = await navigator.credentials.get({ publicKey: opts });
   return !!a;
 }
-let locked = false, hiddenAt = 0;
-function lock() { if (!SET.faceid) return; locked = true; $('lock').hidden = false; $('lock-skip').hidden = webauthnOK(); $('lock-d').textContent = webauthnOK() ? 'Unlock with Face ID to see your bills.' : 'Face ID isn\'t available in this browser.'; }
-async function unlock() {
-  if (!webauthnOK()) { locked = false; $('lock').hidden = true; return; }
-  try { if (await verifyFace()) { locked = false; $('lock').hidden = true; } }
-  catch (e) { $('lock-d').textContent = e && e.name === 'NotAllowedError' ? 'Face ID was cancelled. Tap Unlock to try again.' : 'Face ID didn\'t work. Tap Unlock to try again.'; }
+/* ---------- entry: the 6-digit code, or Face ID once it's on. A screen gate, not encryption (the
+   code is in this public file). Reloads in the same session (pull to refresh, auto-update, new day)
+   stay unlocked unless the app was away for over a minute. ---------- */
+const CODE = '100123';
+const ss = (k, v) => { try { if (v === undefined) return sessionStorage.getItem(k); if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) { return null; } };
+let locked = false, entry = '';
+const dots = () => $('dots').querySelectorAll('i').forEach((d, i) => d.classList.toggle('on', i < entry.length));
+const faceReady = () => SET.faceid && webauthnOK();
+function lock() {
+  locked = true; entry = ''; dots(); ss('zb_ok', null);
+  $('lock').hidden = false; $('lock-d').textContent = faceReady() ? 'Use Face ID or enter your code' : 'Enter your code';
+  $('pad-face').style.visibility = faceReady() ? 'visible' : 'hidden';
+  if (faceReady()) setTimeout(tryFace, 350);   // ask straight away; the Face ID key is there if iOS wants a tap first
 }
-$('lock-btn').addEventListener('click', unlock);
-$('lock-skip').addEventListener('click', () => { locked = false; $('lock').hidden = true; });
-if (SET.faceid) { lock(); setTimeout(unlock, 350); }   // ask straight away; the button is there if iOS wants a tap first
+function unlockNow() {
+  locked = false; entry = ''; dots(); $('lock').hidden = true; ss('zb_ok', '1'); ss('zb_hid', null);
+  if (!SET.faceid && !SET.faceAsked && webauthnOK()) setTimeout(offerFace, 400);
+}
+async function tryFace() {
+  if (!locked || !faceReady()) return;
+  try { if (await verifyFace()) unlockNow(); }
+  catch (e) { if (locked) $('lock-d').textContent = e && e.name === 'NotAllowedError' ? 'Face ID cancelled — enter your code' : 'Face ID didn\'t work — enter your code'; }
+}
+function press(k) {
+  if (!locked || (entry.length >= 6 && k !== 'del')) return;
+  entry = k === 'del' ? entry.slice(0, -1) : entry + k; dots(); $('dots').classList.remove('bad');
+  if (entry.length < 6) return;
+  if (entry === CODE) { setTimeout(unlockNow, 120); return; }
+  $('dots').classList.add('bad'); $('lock-d').textContent = 'Wrong code — try again'; if (navigator.vibrate) navigator.vibrate(60);
+  setTimeout(() => { entry = ''; dots(); }, 380);
+}
+function offerFace() {   // once, after the first unlock with the code
+  SET.faceAsked = true; save('zb_settings', SET);
+  openSheet(`<div class="grab"></div><div class="h">Use Face ID?</div>
+    <div class="q" style="margin-top:0"><span>Unlock with Face ID next time instead of typing the code. You can change this in settings.</span></div>
+    <div class="btns"><button class="no" data-act="close">Not now</button><button class="yes" data-act="face-on">Turn on</button></div>`);
+}
+$('pad').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.id === 'pad-face') tryFace(); else press(b.dataset.k); });
+addEventListener('keydown', e => { if (!locked) return; if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('del'); });
+{ const hid = +ss('zb_hid') || 0; if (ss('zb_ok') === '1' && (!hid || Date.now() - hid < 60000)) { $('lock').hidden = true; ss('zb_hid', null); } else lock(); }
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { hiddenAt = Date.now(); return; }
-  if (SET.faceid && !locked && Date.now() - hiddenAt > 60000) { lock(); setTimeout(unlock, 350); }   // away over a minute → re-lock
+  if (document.hidden) { ss('zb_hid', String(Date.now())); return; }
+  const hid = +ss('zb_hid') || 0; ss('zb_hid', null);
+  if (!locked && hid && Date.now() - hid > 60000) lock();   // away over a minute → re-lock
 });
 
 /* ---------- pull to refresh (home-screen apps have no browser one) ---------- */

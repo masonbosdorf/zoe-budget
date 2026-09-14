@@ -1,40 +1,33 @@
-# Regulars
+# Zoe's Budget
 
-A phone web app that tracks recurring bills and tells you, from the balance in your bills
-account, whether the next week and the fortnight after are covered. Styled after Up Bank's
-*Essentials* screen. Single `index.html`, no backend, no accounts — everything lives in the
-phone's own storage.
+A copy of [Regulars](https://github.com/masonbosdorf/regulars): a phone web app that tracks recurring
+bills and tells you, from the balance in your bills account, whether the next week and the fortnight
+after are covered. Single `index.html`, no backend, no accounts. Everything is saved on the phone.
 
-**Use it:** open the Pages URL on the iPhone → Share → **Add to Home Screen**.
+**Use it:** open https://masonbosdorf.github.io/zoe-budget/ on the iPhone → Share → **Add to Home Screen**.
 
-## What it does
+## Differences from Regulars
 
-- **Arch gauge** — This Week (next 7 days) and Later (days 8–14, a fortnight from today) as fixed segments;
-  your balance lights them up left to right. The coral number is the balance: tap to edit.
-- **Coverage tiles** — Covered / $X short for each window, plus what's spare after.
-- **Regulars** — three-wide cards sorted soonest first. Today's are outlined.
-- **Tap a card** when it's paid → Done moves it to its next occurrence (weekly Monday → next
-  Monday, monthly 10th → the 10th next month) and it re-sorts. Undo in the toast.
-- **Hold a card** to edit or delete. **+** adds one: weekly, fortnightly, monthly, quarterly
-  or yearly; pick a logo or a coloured initial.
-- **History** (clock icon) — every bill you've marked Done: what, how much, when, and what it
-  was due; paid-this-month and last-30-days totals.
-- **Pull down** at the top to refresh.
-- **Face ID on open** (settings) — a passkey on the phone gates the screen; verified locally,
-  nothing leaves the device. Re-locks after a minute in the background.
-- **…** settings: window lengths (both count from today), "Done takes it off the balance",
-  Face ID, Export / Import (JSON via the share sheet), Reset to the seed list.
+- **Starts empty.** No bills are preloaded. Tap **+** to add your own bills and amounts.
+- **Logo presets:** 30 common bills as emoji tiles (rent, electricity, internet, phone, car rego,
+  petrol, groceries, TV and more), plus the same brand logos Regulars uses. Tapping a preset fills
+  in the name if you haven't typed one.
+- **Photo logo:** the camera tile opens the camera roll. The photo is cropped to a square and saved
+  with the bill.
+- **Entry code** on open. You'll be asked once whether you want to use **Face ID** instead (you can
+  also change it in settings). The app locks again after more than a minute in the background.
+- Storage keys start with `zb_`, so this app never mixes data with Regulars on the same phone.
 
-## Files
+## What it does (same as Regulars)
 
-| File | Role |
-|---|---|
-| `index.html` | the whole app (logos embedded as WebP data URIs) |
-| `logos/` | the 128px source tiles + `SOURCES.md` (where each official mark came from) |
-| `icon-180.png` / `icon-512.png` | home-screen icon |
+- **Arch gauge**: This Week (next 7 days) and Later (days 8–14). Your balance lights up the segments.
+  Tap the coral number to edit it.
+- **Tap a bill** when it's paid. **Done** moves it to its next due date, and Undo is in the toast.
+  **Hold** a bill to edit or delete it.
+- **History** (clock icon), **pull down to refresh**, **…** settings (window lengths, Done takes it
+  off the balance, Face ID, Export/Import, Start again).
 
 ## Data
 
-`localStorage` keys: `rg_bills` (the list), `rg_paid` (id → last paid date), `rg_history`,
-`rg_settings`, `rg_bal`. Due dates are computed from the rules each open, never stored. Export before
-changing phones — there is no cloud copy by design.
+`localStorage` keys: `zb_bills`, `zb_paid`, `zb_history`, `zb_settings`, `zb_bal`. There is no cloud
+copy, so export before changing phones. The entry code is a screen lock, not encryption.
