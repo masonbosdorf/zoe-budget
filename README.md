@@ -12,6 +12,8 @@ after are covered. Single `index.html`, no backend, no accounts. Everything is s
 - **Logo presets:** 30 common bills as emoji tiles (rent, electricity, internet, phone, car rego,
   petrol, groceries, TV and more), plus the same brand logos Regulars uses. Tapping a preset fills
   in the name if you haven't typed one.
+- **Any emoji:** the smiley tile opens a field. Tap it, switch to the iPhone emoji keyboard (🌐) and
+  pick any emoji. It shows on a tile in the colour you choose.
 - **Photo logo:** the camera tile opens the camera roll. The photo is cropped to a square and saved
   with the bill.
 - **Entry code** on open. You'll be asked once whether you want to use **Face ID** instead (you can

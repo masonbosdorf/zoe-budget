@@ -253,9 +253,11 @@ const EMOJI = [
   ['loan', '🏦', 'Loan', '#8f8f9c'],        ['bnpl', '🛍️', 'Afterpay', '#5ed39b'],       ['pets', '🐾', 'Pets', '#fbcc72'],
   ['childcare', '🧸', 'Childcare', '#f472b6'], ['education', '🎓', 'Education', '#4a9be6'], ['savings', '🐷', 'Savings', '#f472b6'],
 ];
-EMOJI.forEach(([k, e, n, c]) => { LOGOS['e_' + k] = `<svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#2f2f3c"/><rect width="40" height="40" fill="${c}" fill-opacity=".3"/><text x="20" y="21.5" font-size="23" text-anchor="middle" dominant-baseline="central">${e}</text></svg>`; NAMES['e_' + k] = n; });
+const emojiSVG = (e, c) => `<svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#2f2f3c"/><rect width="40" height="40" fill="${c}" fill-opacity=".3"/><text x="20" y="21.5" font-size="23" text-anchor="middle" dominant-baseline="central">${e}</text></svg>`;
+EMOJI.forEach(([k, e, n, c]) => { LOGOS['e_' + k] = emojiSVG(e, c); NAMES['e_' + k] = n; });
 const EMOJI_KEYS = EMOJI.map(x => 'e_' + x[0]);
 const CAM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>';
+const SMILE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>';
 
 /* ---------- storage ---------- */
 const load = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
@@ -297,6 +299,7 @@ function whenLabel(d) {
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function logoHTML(b) {
   if (b.logo === 'photo' && b.img) return `<img src="${esc(b.img)}" alt="">`;
+  if (b.logo === 'emoji' && b.emoji) return emojiSVG(esc(b.emoji), b.color || COLORS[0]);
   if (b.logo && LOGOS[b.logo]) return LOGOS[b.logo];
   const ch = (b.name || '?').trim()[0] || '?';
   return `<span class="logo" style="background:${b.color || '#8f8f9c'};width:100%;height:100%;border-radius:0">${esc(ch.toUpperCase())}</span>`;
@@ -395,6 +398,7 @@ function openEdit(b) {
   const tile = k => `<button class="pick${e.logo === k ? ' on' : ''}" data-logo="${k}" data-name="${esc(NAMES[k])}" type="button" aria-label="${esc(NAMES[k])}">${LOGOS[k]}</button>`;
   const picks = `<div class="gl">Common bills</div><div class="logos">`
     + `<button class="pick photo${e.img ? ' has' : ''}${e.logo === 'photo' ? ' on' : ''}" data-logo="photo" type="button" aria-label="Photo from camera roll">${e.img ? `<img src="${esc(e.img)}" alt="">` : CAM}</button>`
+    + `<button class="pick photo${e.emoji ? ' has' : ''}${e.logo === 'emoji' ? ' on' : ''}" data-logo="emoji" type="button" aria-label="Any emoji">${e.emoji ? emojiSVG(esc(e.emoji), e.color || COLORS[0]) : SMILE}</button>`
     + EMOJI_KEYS.map(tile).join('')
     + `<button class="pick${!e.logo ? ' on' : ''}" data-logo="" type="button" style="background:${e.color || COLORS[0]}">${esc((e.name || 'A').trim()[0] || 'A').toUpperCase()}</button>`
     + `</div><div class="gl">Brands</div><div class="logos">${BRAND_KEYS.map(tile).join('')}</div>`;
@@ -405,7 +409,7 @@ function openEdit(b) {
     <div class="f" id="f-dow" ${e.period === 'w' ? '' : 'hidden'}><label>Day</label><div class="dows" id="e-dow">${DOW.map((d, i) => `<button type="button" data-d="${i}" class="${e.dow === i ? 'on' : ''}">${d}</button>`).join('')}</div></div>
     <div class="f" id="f-day" ${e.period === 'm' ? '' : 'hidden'}><label>Day of month</label><input type="number" id="e-day" value="${e.day || 1}" min="1" max="31" inputmode="numeric"></div>
     <div class="f" id="f-next" ${'fqy'.includes(e.period) ? '' : 'hidden'}><label>Next due</label><input type="date" id="e-next" value="${e.next || iso(today)}"></div>
-    <div class="f"><label>Logo</label><div id="e-logos">${picks}</div><div class="swatches" id="e-colors" ${e.logo ? 'hidden' : ''}>${COLORS.map(c => `<button type="button" data-c="${c}" style="background:${c}" class="${e.color === c ? 'on' : ''}"></button>`).join('')}</div></div>
+    <div class="f"><label>Logo</label><div id="e-logos">${picks}</div><input type="text" id="e-emoji" value="${esc(e.emoji || '')}" placeholder="Tap here, then 🌐 for the emoji keyboard" autocomplete="off" style="margin-top:10px" ${e.logo === 'emoji' ? '' : 'hidden'}><div class="swatches" id="e-colors" ${e.logo && e.logo !== 'emoji' ? 'hidden' : ''}>${COLORS.map(c => `<button type="button" data-c="${c}" style="background:${c}" class="${e.color === c ? 'on' : ''}"></button>`).join('')}</div></div>
     <div class="btns">${b ? '<button class="del" data-act="delete">Delete</button>' : '<button class="no" data-act="close">Cancel</button>'}<button class="yes" data-act="save">Save</button></div>
     ${b ? '<button class="link" data-act="close">Cancel</button>' : ''}`);
   setTimeout(() => { if (!b) $('e-name').focus(); }, 50);
@@ -414,6 +418,7 @@ function saveEdit() {
   const e = editing; e.name = $('e-name').value.trim(); e.amt = parseFloat($('e-amt').value) || 0;
   if (!e.name) { $('e-name').focus(); return; }
   if (e.logo !== 'photo') delete e.img;
+  if (e.logo !== 'emoji') delete e.emoji;
   if (e.period === 'm') e.day = Math.min(31, Math.max(1, parseInt($('e-day').value, 10) || 1));
   if ('fqy'.includes(e.period)) e.next = $('e-next').value || iso(today);
   const i = BILLS.findIndex(x => x.id === e.id); if (i >= 0) BILLS[i] = e; else BILLS.push(e);
@@ -425,10 +430,20 @@ function deleteBill(id) {
 }
 
 function pickLogo(l) {
-  editing.logo = l.dataset.logo; $('e-logos').querySelectorAll('.pick').forEach(x => x.classList.toggle('on', x === l)); $('e-colors').hidden = !!editing.logo;
+  editing.logo = l.dataset.logo; $('e-logos').querySelectorAll('.pick').forEach(x => x.classList.toggle('on', x === l));
+  $('e-colors').hidden = !!editing.logo && editing.logo !== 'emoji'; $('e-emoji').hidden = editing.logo !== 'emoji';
+  if (editing.logo === 'emoji') $('e-emoji').focus();
   const nm = $('e-name'), n = l.dataset.name;
   if (n && (!nm.value.trim() || nm.value === autoName)) { nm.value = autoName = n; nm.dispatchEvent(new Event('input', { bubbles: true })); }
 }
+/* any emoji: the field takes whatever the iPhone emoji keyboard sends and keeps the last emoji typed */
+$('sheet').addEventListener('input', e => {
+  if (e.target.id !== 'e-emoji' || !editing) return;
+  const parts = window.Intl && Intl.Segmenter ? [...new Intl.Segmenter().segment(e.target.value)].map(x => x.segment) : Array.from(e.target.value);
+  const g = parts.filter(x => /\p{Extended_Pictographic}|\p{Regional_Indicator}/u.test(x)).pop(); if (!g) return;
+  editing.emoji = g; e.target.value = g;
+  const t = $('e-logos').querySelector('[data-logo="emoji"]'); t.innerHTML = emojiSVG(esc(g), editing.color || COLORS[0]); t.classList.add('has'); pickLogo(t);
+});
 /* photo from the camera roll → centre-cropped 192px JPEG stored on the bill */
 $('photo').addEventListener('change', () => {
   const f = $('photo').files[0]; $('photo').value = ''; if (!f || !editing) return;
@@ -518,8 +533,8 @@ $('dim').addEventListener('click', e => {
   else if (act === 'save-settings') { SET.windowA = Math.max(1, parseInt($('s-a').value, 10) || 7); SET.windowB = Math.max(SET.windowA + 1, parseInt($('s-b').value, 10) || 14); save('zb_settings', SET); closeSheet(); render(); }
   const p = e.target.closest('#e-period button'); if (p && editing) { editing.period = p.dataset.p; [...p.parentNode.children].forEach(x => x.classList.toggle('on', x === p)); $('f-dow').hidden = editing.period !== 'w'; $('f-day').hidden = editing.period !== 'm'; $('f-next').hidden = !'fqy'.includes(editing.period); }
   const d = e.target.closest('#e-dow button'); if (d && editing) { editing.dow = +d.dataset.d; [...d.parentNode.children].forEach(x => x.classList.toggle('on', x === d)); }
-  const l = e.target.closest('#e-logos .pick'); if (l && editing) { if (l.dataset.logo === 'photo' && (!editing.img || editing.logo === 'photo')) $('photo').click(); else pickLogo(l); }
-  const c = e.target.closest('#e-colors button'); if (c && editing) { editing.color = c.dataset.c; [...c.parentNode.children].forEach(x => x.classList.toggle('on', x === c)); const lp = $('e-logos').querySelector('[data-logo=""]'); if (lp) lp.style.background = editing.color; }
+  const l = e.target.closest('#e-logos .pick'); if (l && editing) { if (l.dataset.logo === 'photo' && (!editing.img || editing.logo === 'photo')) $('photo').click(); else if (l.dataset.logo === 'emoji' && !editing.emoji) { $('e-emoji').hidden = false; $('e-emoji').focus(); } else pickLogo(l); }
+  const c = e.target.closest('#e-colors button'); if (c && editing) { editing.color = c.dataset.c; [...c.parentNode.children].forEach(x => x.classList.toggle('on', x === c)); const lp = $('e-logos').querySelector('[data-logo=""]'); if (lp) lp.style.background = editing.color; const ep = $('e-logos').querySelector('[data-logo="emoji"]'); if (ep && editing.emoji) ep.innerHTML = emojiSVG(esc(editing.emoji), editing.color); }
   if (e.target.id === 's-sub') { SET.subtract = !SET.subtract; e.target.classList.toggle('on', SET.subtract); save('zb_settings', SET); }
   if (e.target.id === 's-face') { if (SET.faceid) { SET.faceid = false; SET.cred = null; save('zb_settings', SET); e.target.classList.remove('on'); } else enrolFace(e.target); }
 });
